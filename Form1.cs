@@ -15,6 +15,7 @@ namespace TestWinForms
         public double Dec;
         public double Radius;
         public SolverStatus Status;
+        public string[] ObjectsInField { get; set; }
     }
 
     public enum SolverStatus
@@ -67,6 +68,11 @@ namespace TestWinForms
 			    if (SolverStatus.Success.Equals(res.Status))
 			    {
 			        textBoxLog.Text += $@"Solution : RA : {res.RA} , Dec : {res.Dec} : {Environment.NewLine}";
+
+                    foreach (string obj in res.ObjectsInField)
+                    {
+                        textBoxLog.Text += $"{obj}{Environment.NewLine}";
+                    }
 			    }
 			    else
 			    {
@@ -148,11 +154,13 @@ namespace TestWinForms
                 !ct.IsCancellationRequested)
             {
                 CalibrationResponse calibrationResponse = client.GetCalibration(submissionStatusResponse.jobs[0]);
+                var objectsInFieldResponse = client.GetObjectsInField(submissionStatusResponse.jobs[0]);
 
                 solution.RA = calibrationResponse.ra;
                 solution.Dec = calibrationResponse.dec;
                 solution.Radius = calibrationResponse.radius;
                 solution.Status = SolverStatus.Success;
+                solution.ObjectsInField = objectsInFieldResponse.objects_in_field;
                 return solution;
             }
 
